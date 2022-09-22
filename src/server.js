@@ -1,0 +1,46 @@
+const http = require('http');
+const url = require('url');
+const query = require('querystring');
+const htmlResponseHandler = require('./htmlResponses.js');
+const jsonResponseHandler = require('./jsonResponses.js');
+
+const port = process.env.PORT || process.env.NODE_PORT || 3000;
+
+const urlStruct = {
+
+  'GET': {
+    '/': htmlResponseHandler.getIndex,
+    '/getUsers': jsonResponseHandler.success,
+    '/notReal': jsonResponseHandler.notFound,
+    index: htmlResponseHandler.getIndex,
+    '/style.css': htmlResponseHandler.getStyle,
+    notFound: jsonResponseHandler.notFound
+  },
+  'HEAD': {
+    '/getUsers': jsonResponseHandler.success,
+    '/notReal': jsonResponseHandler.notFound,
+    // notFound: jsonResponseHandler.notFoundMeta
+  }
+};
+
+const onRequest = (request, response) => {
+  const parsedUrl = url.parse(request.url);
+
+  //as learned from the demo, we are only accepting GET and HEAD requests,
+  //so for anything else, lets send a '404 not found' code
+  if(!urlStruct[request.method]) {
+    return urlStruct['HEAD'].notFound(request, response);
+  }
+
+
+  // based on our request type, either call the GET or HEAD methods
+  if (urlStruct[request.method][parsedUrl.pathname]) {
+    urlStruct[request.method][parsedUrl.pathname](request, response);
+  } else {
+    urlStruct[request.method].notFound(request, response);
+  }
+};
+
+http.createServer(onRequest).listen(port, () => {
+  console.log(`Listening on 127.0.0.1: ${port}`);
+});
