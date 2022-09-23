@@ -1,5 +1,4 @@
 const respondJSON = (request, response, status, object) => {
-
   response.writeHead(status, { 'Content-Type': 'application/json' });
   // gotta stringify to get it to just text (which we can actually send)
   response.write(JSON.stringify(object));
@@ -12,23 +11,24 @@ const respondJSONMeta = (request, response, status, object) => {
   response.end();
 };
 
+const users = {};
+
 // get user object
 // should calculate a 200
 const getUsers = (request, response) => {
-  //json object to send
+  // json object to send
   const responseJSON = {
     users,
   };
 
-  //return 200 with message
+  // return 200 with message
   return respondJSON(request, response, 200, responseJSON);
 };
 
-// get meta info about user object
-// should calculate a 200 
+
+//just returns meta, no big message/data
 const getUsersMeta = (request, response) => {
-  //return 200 without message, just the meta data
-  return respondJSONMeta(request, response, 200);
+  respondJSONMeta(request, response, 200);
 };
 
 const notFound = (request, response) => {

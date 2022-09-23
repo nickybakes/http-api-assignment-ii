@@ -15,35 +15,33 @@
       //either json or xml tbh
       let contentType = response.headers.get('Content-Type');
 
-      switch(response.status) {
-        case 200: 
+      switch (response.status) {
+        case 200:
           content.innerHTML = `<b>Success</b>`;
           break;
         case 404:
           content.innerHTML = `<b>Resource Not Found</b>`;
           break;
-        default: 
+        default:
           content.innerHTML = `Error code not implemented by client.`;
           break;
       }
 
-      content.innerHTML += `<p>Message: ${responseMessage}</p>`;
+      content.innerHTML += `<p>${responseMessage}</p>`;
 
       if (methodIsGet) {
         let responseJsonObject = await response.json();
-        let responseJsonString = JSON.stringify(obj);
+        let responseJsonString = JSON.stringify(responseJsonObject);
 
         content.innerHTML += `<p>${responseJsonString}</p>`;
-      } else {
-        content.innerHTML += '<p>Meta Data Received</p>';
       }
     };
 
     const requestUpdate = async (userForm) => {
-      const url = userForm.querySelector('#urlField').value;
-      const method = userForm.querySelector('#methodSelect').value;
+      let url = userForm.querySelector('#urlField').value;
+      let method = userForm.querySelector('#methodSelect').value;
 
-      const params = {
+      let params = {
         method,
         headers: { 'Accept': 'application/json' },
       }
@@ -52,17 +50,39 @@
       handleResponse(response, method === 'get');
     };
 
+    const sendPost = async (nameForm) => {
+      let nameAction = nameForm.getAttribute('action');
+      let nameMethod = nameForm.getAttribute('method');
+      let nameField = nameForm.querySelector('#nameField');
+      let ageField = nameForm.querySelector('#ageField');
+
+      let bodyData = `name=${nameField.value}&age=${ageField.value}`;
+
+      let response = await fetch(nameAction, {
+        method: nameMethod,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
+        },
+        body: bodyData,
+      });
+
+      handleResponse(response);
+    }
+
     const init = () => {
       const nameForm = document.querySelector("#nameForm");
       const userForm = document.querySelector("#userForm");
 
       const getUsers = (e) => {
-        // requestUpdate(userForm);
+        e.preventDefault();
+        requestUpdate(userForm);
         return false;
       }
 
       const addUser = (e) => {
-        // sendPost(nameForm);
+        e.preventDefault();
+        sendPost(nameForm);
         return false;
       }
 
