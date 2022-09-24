@@ -7,31 +7,39 @@
 
   <script>
 
-    const handleResponse = async (response, methodIsGet) => {
-      const content = document.getElementById('content');
-
-      let responseMessage = '';
-
-      //either json or xml tbh
-      let contentType = response.headers.get('Content-Type');
+    const handleResponse = async (response) => {
+      const content = document.querySelector('#content');
 
       switch (response.status) {
         case 200:
           content.innerHTML = `<b>Success</b>`;
           break;
+        case 201:
+          content.innerHTML = '<b>Created</b>';
+          break;
+        case 204:
+          content.innerHTML = '<b>Updated (No Content)</b>';
+          return;
+        case 400:
+          content.innerHTML = `<b>Bad Request</b>`;
+          break;
         case 404:
-          content.innerHTML = `<b>Resource Not Found</b>`;
+          content.innerHTML = `<b>Not Found</b>`;
           break;
         default:
           content.innerHTML = `Error code not implemented by client.`;
           break;
       }
 
-      content.innerHTML += `<p>${responseMessage}</p>`;
-
-      if (methodIsGet) {
-        let responseJsonObject = await response.json();
-        let responseJsonString = JSON.stringify(responseJsonObject);
+      //we check if the response has any text to see if it was a GET or HEAD request
+      let responseText = await response.text();
+      console.log(responseText);
+      
+      //no text means no body means its a HEAD request. if it has
+      //text/body, then its a GET
+      if (responseText) {
+        let responseJsonObject = JSON.parse(responseText);
+        let responseJsonString = JSON.stringify(responseJsonObject.message);
 
         content.innerHTML += `<p>${responseJsonString}</p>`;
       }
@@ -47,7 +55,7 @@
       }
 
       let response = await fetch(url, params);
-      handleResponse(response, method === 'get');
+      handleResponse(response);
     };
 
     const sendPost = async (nameForm) => {
@@ -58,14 +66,16 @@
 
       let bodyData = `name=${nameField.value}&age=${ageField.value}`;
 
-      let response = await fetch(nameAction, {
+      let params = {
         method: nameMethod,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json',
         },
         body: bodyData,
-      });
+      }
+
+      let response = await fetch(nameAction, params);
 
       handleResponse(response);
     }

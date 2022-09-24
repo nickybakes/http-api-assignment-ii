@@ -20,6 +20,9 @@ const urlStruct = {
     '/notReal': jsonResponseHandler.notFound,
     // notFound: jsonResponseHandler.notFoundMeta
   },
+  POST: {
+    '/addUser': jsonResponseHandler.parseBody,
+  },
 };
 
 const onRequest = (request, response) => {
