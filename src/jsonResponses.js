@@ -48,6 +48,7 @@ const addUser = (request, response, body) => {
     statusCode = 201;
     users[body.name] = {};
   }
+
   users[body.name].name = body.name;
   users[body.name].age = body.age;
 

@@ -10,39 +10,48 @@
     const handleResponse = async (response) => {
       const content = document.querySelector('#content');
 
+
+      let contentText = '';
+
       switch (response.status) {
         case 200:
-          content.innerHTML = `<b>Success</b>`;
+          contentText = `<b>Success</b>`;
           break;
         case 201:
-          content.innerHTML = '<b>Created</b>';
+          contentText = `<b>Created</b>`;
           break;
         case 204:
-          content.innerHTML = '<b>Updated (No Content)</b>';
-          return;
+          contentText = `<b>Updated (No Content)</b>`;
+          break;
         case 400:
-          content.innerHTML = `<b>Bad Request</b>`;
+          contentText = `<b>Bad Request</b>`;
           break;
         case 404:
-          content.innerHTML = `<b>Not Found</b>`;
+          contentText = `<b>Not Found</b>`;
           break;
         default:
-          content.innerHTML = `Error code not implemented by client.`;
+          contentText = `Error code not implemented by client.`;
           break;
       }
 
       //we check if the response has any text to see if it was a GET or HEAD request
       let responseText = await response.text();
+
+      //print out whatever we get. i like to print out even if it
+      //is a head request, just so we have some feedback that
+      //we got a response of some sort
       console.log(responseText);
-      
+
       //no text means no body means its a HEAD request. if it has
       //text/body, then its a GET
-      if (responseText) {
+      if (responseText && responseText != '') {
         let responseJsonObject = JSON.parse(responseText);
         let responseJsonString = JSON.stringify(responseJsonObject.message);
 
-        content.innerHTML += `<p>${responseJsonString}</p>`;
+        contentText += `<p>${responseJsonString}</p>`;
       }
+
+      content.innerHTML = contentText;
     };
 
     const requestUpdate = async (userForm) => {
